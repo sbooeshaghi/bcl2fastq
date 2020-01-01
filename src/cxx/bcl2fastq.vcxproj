@@ -1,0 +1,327 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{DE34C5BD-A131-49B0-AF6C-1D1B5282DA0C}</ProjectGuid>
+    <SccProjectName>SAK</SccProjectName>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccProvider>SAK</SccProvider>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>bcl2fastq</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(Platform)\$(Configuration)\</OutDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\redist\Compression\zlib-1.2.5;$(SolutionDir)..\..\redist\boost-1.58\include;include;$(SolutionDir)..\..\redist\libxslt-1.1.26\include;$(SolutionDir)..\..\redist\libxml2-2.7.8\include</AdditionalIncludeDirectories>
+      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\Compression\$(Platform)\$(Configuration);$(ProjectDir)..\..\redist\boost-1.54\lib64;$(ProjectDir)..\..\redist\libxslt-1.1.26\lib;$(ProjectDir)..\..\redist\libxml2-2.7.8\lib</AdditionalLibraryDirectories>
+    </Link>
+    <PostBuildEvent>
+      <Command>robocopy "$(SolutionDir)..\..\redist\libxml2-2.7.8\lib" $(OutputPath) libxml2.dll</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\..\redist\Compression\zlib-1.2.5;$(SolutionDir)..\..\redist\boost-1.58\include;include;$(SolutionDir)..\..\redist\libxslt-1.1.26\include;$(SolutionDir)..\..\redist\libxml2-2.7.8\include</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\Compression\$(Platform)\$(Configuration);$(ProjectDir)..\..\redist\boost-1.58\lib64;$(ProjectDir)..\..\redist\libxslt-1.1.26\lib;$(ProjectDir)..\..\redist\libxml2-2.7.8\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libxml2.lib;libxslt.lib;libexslt.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <PostBuildEvent>
+      <Command>robocopy "$(SolutionDir)..\..\redist\libxml2-2.7.8\lib" $(OutputPath) libxml2.dll
+robocopy "$(SolutionDir)..\..\redist\libxslt-1.1.26\lib" $(OutputPath) libxslt.dll libexslt.dll
+robocopy "$(SolutionDir)..\xsl" $(OutputPath)share\xsl /E
+robocopy "$(SolutionDir)..\css" $(OutputPath)share\css /E
+
+if %ERRORLEVEL% EQU 1 exit 0</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="include\common\CsvGrammar.hh" />
+    <ClInclude Include="include\common\CsvGrammar.hpp" />
+    <ClInclude Include="include\common\Debug.hh" />
+    <ClInclude Include="include\common\DirectoryValidator.hh" />
+    <ClInclude Include="include\common\Endianness.hh" />
+    <ClInclude Include="include\common\Exceptions.hh" />
+    <ClInclude Include="include\common\FastIo.hh" />
+    <ClInclude Include="include\common\FastIo.hpp" />
+    <ClInclude Include="include\common\FileSystem.hh" />
+    <ClInclude Include="include\common\InstallationPath.hh" />
+    <ClInclude Include="include\common\Logger.hh" />
+    <ClInclude Include="include\common\Options.hh" />
+    <ClInclude Include="include\common\Program.hh" />
+    <ClInclude Include="include\common\Program.hpp" />
+    <ClInclude Include="include\common\ProgramInfo.hh" />
+    <ClInclude Include="include\common\SampleMetadata.hh" />
+    <ClInclude Include="include\common\StaticMemPool.hh" />
+    <ClInclude Include="include\common\StaticMemPool.hpp" />
+    <ClInclude Include="include\common\SystemCompatibility.hh" />
+    <ClInclude Include="include\common\SystemCompatibility.hpp" />
+    <ClInclude Include="include\common\Threads.hh" />
+    <ClInclude Include="include\common\Threads.hpp" />
+    <ClInclude Include="include\common\Types.hh" />
+    <ClInclude Include="include\config\Bcl2FastqOptions.hh" />
+    <ClInclude Include="include\config\SampleSheetCsv.hh" />
+    <ClInclude Include="include\conversion\AdapterLocator.hh" />
+    <ClInclude Include="include\conversion\AdapterLocator.hpp" />
+    <ClInclude Include="include\conversion\BclBaseConversion.hh" />
+    <ClInclude Include="include\conversion\BclLoader.hh" />
+    <ClInclude Include="include\conversion\BclReader.hh" />
+    <ClInclude Include="include\conversion\Converter.hh" />
+    <ClInclude Include="include\conversion\Demultiplexer.hh" />
+    <ClInclude Include="include\conversion\Demultiplexer.hpp" />
+    <ClInclude Include="include\conversion\FastqBuffer.hh" />
+    <ClInclude Include="include\conversion\FastqCreator.hh" />
+    <ClInclude Include="include\conversion\FastqCreator.hpp" />
+    <ClInclude Include="include\conversion\FastqIterator.hh" />
+    <ClInclude Include="include\conversion\FastqIterator.hpp" />
+    <ClInclude Include="include\conversion\FastqWriter.hh" />
+    <ClInclude Include="include\conversion\SampleIndex.hh" />
+    <ClInclude Include="include\conversion\Stage.hh" />
+    <ClInclude Include="include\conversion\Stage.hpp" />
+    <ClInclude Include="include\conversion\Task.hh" />
+    <ClInclude Include="include\conversion\TaskQueue.hh" />
+    <ClInclude Include="include\conversion\TaskQueue.hpp" />
+    <ClInclude Include="include\conversion\ThreadPool.hh" />
+    <ClInclude Include="include\conversion\ThreadSafeQueue.hh" />
+    <ClInclude Include="include\conversion\ThreadSafeQueue.hpp" />
+    <ClInclude Include="include\data\AggregatedBclFileReader.hh" />
+    <ClInclude Include="include\data\BclBuffer.hh" />
+    <ClInclude Include="include\data\BclFile.hh" />
+    <ClInclude Include="include\data\BclFileReader.hh" />
+    <ClInclude Include="include\data\ControlFile.hh" />
+    <ClInclude Include="include\data\CycleBCIFile.hh" />
+    <ClInclude Include="include\data\FastqFile.hh" />
+    <ClInclude Include="include\data\FileReader.hh" />
+    <ClInclude Include="include\data\FileReader.hpp" />
+    <ClInclude Include="include\data\FilterFile.hh" />
+    <ClInclude Include="include\data\InteropFile.hh" />
+    <ClInclude Include="include\data\PositionsFile.hh" />
+    <ClInclude Include="include\data\RawBclBuffer.hh" />
+    <ClInclude Include="include\data\TileBclFileReader.hh" />
+    <ClInclude Include="include\io\Bgzf.hh" />
+    <ClInclude Include="include\io\BgzfCompressor.hh" />
+    <ClInclude Include="include\io\FileBufWithReopen.hh" />
+    <ClInclude Include="include\io\FileBufWithReopen.hpp" />
+    <ClInclude Include="include\io\GzipCompressor.hh" />
+    <ClInclude Include="include\io\GzipDecompressor.hh" />
+    <ClInclude Include="include\io\GzipDecompressor.hpp" />
+    <ClInclude Include="include\io\GzipHeader.hh" />
+    <ClInclude Include="include\io\Utility.hh" />
+    <ClInclude Include="include\io\Xml.hh" />
+    <ClInclude Include="include\io\Xml.hpp" />
+    <ClInclude Include="include\layout\Barcode.hh" />
+    <ClInclude Include="include\layout\Barcode.hpp" />
+    <ClInclude Include="include\layout\BarcodeCollisionDetector.hh" />
+    <ClInclude Include="include\layout\BarcodeTranslationTable.hh" />
+    <ClInclude Include="include\layout\BCIndex.hh" />
+    <ClInclude Include="include\layout\ConfigXml.hh" />
+    <ClInclude Include="include\layout\CycleInfo.hh" />
+    <ClInclude Include="include\layout\FileExistenceVerifier.hh" />
+    <ClInclude Include="include\layout\FlowcellInfo.hh" />
+    <ClInclude Include="include\layout\LaneInfo.hh" />
+    <ClInclude Include="include\layout\Layout.hh" />
+    <ClInclude Include="include\layout\ReadInfo.hh" />
+    <ClInclude Include="include\layout\ReadMetadata.hh" />
+    <ClInclude Include="include\layout\RunInfoXml.hh" />
+    <ClInclude Include="include\layout\SampleInfo.hh" />
+    <ClInclude Include="include\layout\TileInfo.hh" />
+    <ClInclude Include="include\layout\UseBasesMask.hh" />
+    <ClInclude Include="include\stats\BarcodeHits.hh" />
+    <ClInclude Include="include\stats\BarcodeStats.hh" />
+    <ClInclude Include="include\stats\ConversionStatsXml.hh" />
+    <ClInclude Include="include\stats\DemultiplexingStatsXml.hh" />
+    <ClInclude Include="include\stats\DemuxReportGenerator.hh" />
+    <ClInclude Include="include\stats\Json.hh" />
+    <ClInclude Include="include\stats\TileStats.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="bin\bcl2fastq.cpp" />
+    <ClCompile Include="lib\common\CsvGrammar.cpp" />
+    <ClCompile Include="lib\common\DirectoryValidator.cpp" />
+    <ClCompile Include="lib\common\Exceptions.cpp" />
+    <ClCompile Include="lib\common\FileSystem.cpp" />
+    <ClCompile Include="lib\common\InstallationPath.cpp" />
+    <ClCompile Include="lib\common\Logger.cpp" />
+    <ClCompile Include="lib\common\Options.cpp" />
+    <ClCompile Include="lib\common\ProgramInfo.cpp" />
+    <ClCompile Include="lib\common\SystemCompatibility.cpp" />
+    <ClCompile Include="lib\config\Bcl2FastqOptions.cpp" />
+    <ClCompile Include="lib\config\SampleSheetCsv.cpp" />
+    <ClCompile Include="lib\conversion\BclLoader.cpp" />
+    <ClCompile Include="lib\conversion\BclReader.cpp" />
+    <ClCompile Include="lib\conversion\Converter.cpp" />
+    <ClCompile Include="lib\conversion\Demultiplexer.cpp" />
+    <ClCompile Include="lib\conversion\FastqBuffer.cpp" />
+    <ClCompile Include="lib\conversion\FastqCreator.cpp" />
+    <ClCompile Include="lib\conversion\FastqWriter.cpp" />
+    <ClCompile Include="lib\conversion\SampleIndex.cpp" />
+    <ClCompile Include="lib\conversion\Stage.cpp" />
+    <ClCompile Include="lib\conversion\Task.cpp" />
+    <ClCompile Include="lib\conversion\ThreadPool.cpp" />
+    <ClCompile Include="lib\data\AggregatedBclFileReader.cpp" />
+    <ClCompile Include="lib\data\BclFile.cpp" />
+    <ClCompile Include="lib\data\CbclFile.cpp" />
+    <ClCompile Include="lib\data\ControlFile.cpp" />
+    <ClCompile Include="lib\data\CycleBCIFile.cpp" />
+    <ClCompile Include="lib\data\FastqFile.cpp" />
+    <ClCompile Include="lib\data\FileReader.cpp" />
+    <ClCompile Include="lib\data\FilterFile.cpp" />
+    <ClCompile Include="lib\data\InteropFile.cpp" />
+    <ClCompile Include="lib\data\PositionsFile.cpp" />
+    <ClCompile Include="lib\data\TileBclFileReader.cpp" />
+    <ClCompile Include="lib\io\GzipCompressor.cpp" />
+    <ClCompile Include="lib\io\GzipDecompressor.cpp" />
+    <ClCompile Include="lib\io\SyncFile.cpp" />
+    <ClCompile Include="lib\io\Utility.cpp" />
+    <ClCompile Include="lib\io\Xml.cpp" />
+    <ClCompile Include="lib\layout\Barcode.cpp" />
+    <ClCompile Include="lib\layout\BarcodeCollisionDetector.cpp" />
+    <ClCompile Include="lib\layout\BarcodeTranslationTable.cpp" />
+    <ClCompile Include="lib\layout\BCIndex.cpp" />
+    <ClCompile Include="lib\layout\ConfigXml.cpp" />
+    <ClCompile Include="lib\layout\CycleInfo.cpp" />
+    <ClCompile Include="lib\layout\FileExistenceVerifier.cpp" />
+    <ClCompile Include="lib\layout\FlowcellInfo.cpp" />
+    <ClCompile Include="lib\layout\LaneInfo.cpp" />
+    <ClCompile Include="lib\layout\Layout.cpp" />
+    <ClCompile Include="lib\layout\ReadInfo.cpp" />
+    <ClCompile Include="lib\layout\RunInfoXml.cpp" />
+    <ClCompile Include="lib\layout\SampleInfo.cpp" />
+    <ClCompile Include="lib\layout\TileInfo.cpp" />
+    <ClCompile Include="lib\layout\UseBasesMask.cpp" />
+    <ClCompile Include="lib\stats\ConversionStatsXml.cpp" />
+    <ClCompile Include="lib\stats\DemultiplexingStatsXml.cpp" />
+    <ClCompile Include="lib\stats\DemuxReportGenerator.cpp" />
+    <ClCompile Include="lib\stats\Json.cpp" />
+    <ClCompile Include="lib\stats\TileStats.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

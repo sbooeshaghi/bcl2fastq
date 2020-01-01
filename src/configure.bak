@@ -1,0 +1,431 @@
+#!/bin/bash
+################################################################################
+##
+## BCL to FASTQ file converter
+## Copyright (c) 2007-2017 Illumina, Inc.
+##
+## This software is covered by the accompanying EULA
+## and certain third party copyright/licenses, and any user of this
+## source file is bound by the terms therein.
+##
+################################################################################
+##
+## file configure
+##
+## Top level configuration file.
+##
+## author Come Raczy
+##
+################################################################################
+
+
+# set -x
+# set -e
+set -o pipefail # bash only
+shopt -s compat31 2>/dev/null
+
+
+# Version information
+bcl2fastq_name_short="bcl2fastq"
+bcl2fastq_name_long="BCL to FASTQ file converter"
+bcl2fastq_copyright="Copyright (c) 2007-2017 Illumina, Inc."
+bcl2fastq_version_major="2"
+bcl2fastq_version_minor="20"
+bcl2fastq_version_patch="0"
+bcl2fastq_version_build="0"
+bcl2fastq_version="${bcl2fastq_version_major}.${bcl2fastq_version_minor}.${bcl2fastq_version_patch}.${bcl2fastq_version_build}"
+bcl2fastq_version_full="${bcl2fastq_name_long} (${bcl2fastq_name_short}-${bcl2fastq_version})"
+
+# Display BCL2FASTQ configure usage
+bcl2fastq_usage()
+{
+    cat <<EOF
+Usage: $0 [options]
+Options: [defaults in brackets after descriptions]
+
+Configuration:
+
+  --terse                     display less information
+                              (disables CMAKE_VERBOSE_MAKEFILE)
+
+  --verbose                   display more information
+                              (enables CMAKE_VERBOSE_MAKEFILE)
+
+  --version                   only print version information
+
+  --help                      print this message
+
+  --build-type                specify the build type for CMake (affects
+                              compiler options). Allowed values are "",
+                              "Debug", "Release", "RelWithDebInfo",
+                              and "MinSizeRel"
+                              [RelWithDebInfo]
+
+  --static                    forces library static linking
+
+  --package-type=type         enables generation of deployment package target
+                              (make package). Valid types are: rpm, deb, tgz
+
+  --parallel=n                build cmake and boost in parallel if needed,
+                              where n is the number of nodes
+                              [1]
+
+  --with-cmake=CMAKE          specify the cmake executable
+                              [cmake]
+
+  --force-builddir            allows build directory to be the same as source
+                              directory
+
+  --with-unit-tests           allow unit testing during the build
+
+  --without-unit-tests        prevent unit testing during the build (default)
+
+Directory and file names:
+
+  --prefix=PREFIX             install files in tree rooted at PREFIX
+                              [${bcl2fastq_default_prefix}]
+
+  --exec-prefix=EPREFIX       install binary files in tree rooted at EPREFIX
+                              [PREFIX]
+
+  --bindir=DIR                install executable in DIR
+                              [EPREFIX/bin]
+
+  --libdir=DIR                install library files in DIR
+                              [EPREFIX/lib/${bcl2fastq_name_short}-${bcl2fastq_version}]
+
+  --libexecdir=DIR            install library programs in DIR
+                              [EPREFIX/libexec/${bcl2fastq_name_short}-${bcl2fastq_version}]
+
+  --includedir=DIR            install include files in DIR
+                              [PREFIX/include/${bcl2fastq_name_short}-${bcl2fastq_version}]
+
+  --datadir=DATADIR           install data files in DIR
+                              [PREFIX/share/${bcl2fastq_name_short}-${bcl2fastq_version}]
+
+  --docdir=DIR                install documentation in DIR
+                              [DATADIR/doc]
+
+  --mandir=DIR                install man pages files in DIR/manN
+                              [PREFIX/man]
+
+  --builddir=DIR              build bcl2fastq in DIR
+                              [./]
+
+Some influential environment variables:
+
+  BOOST_ROOT                  location of the boost library
+
+  BOOST_INCLUDEDIR            location of the include directory of boost
+
+  BOOST_LIBRARYDIR            location of the lib directory of boost
+
+  CC                          C compiler command
+
+  CFLAGS                      C compiler flags
+
+  LDFLAGS                     linker flags, e.g. -L<lib dir> if you have
+                              libraries in a nonstandard directory <lib dir>
+
+  CXX                         C++ compiler command
+
+  CXXFLAGS                    C++ compiler flags
+
+  CMAKE_OPTIONS               CMake command line options
+                              (for CMAKE_BUILD_TYPE, use --build-type)
+
+
+Use these variables to override the choices made by 'configure' or to help
+it to find libraries and programs with nonstandard names/locations.
+
+EOF
+    exit 10
+}
+
+# Helper function to fix windows paths.
+bcl2fastq_fix_slashes ()
+{
+    echo "$1" | sed 's/\\/\//g'
+}
+
+
+# Use gcc/g++ by default.
+export CC=${CC:="gcc"}
+export CXX=${CXX:="g++"}
+
+# Detect system and directory information.
+bcl2fastq_system="`uname`"
+bcl2fastq_processor="`uname -p`"
+bcl2fastq_source_dir="`echo $0 | sed -n '/\//{s/\/[^\/]*$//;p;}'`"
+bcl2fastq_source_dir="`(cd "${bcl2fastq_source_dir}";pwd)`"
+bcl2fastq_redist_dir="${bcl2fastq_source_dir}/../redist"
+bcl2fastq_bootstrap_dir="${bcl2fastq_source_dir}/cmake/bootstrap"
+bcl2fastq_build_dir="`pwd`"
+
+# Determine whether this is a MinGW environment.
+if echo "${bcl2fastq_system}" | grep MINGW >/dev/null 2>&1; then
+    bcl2fastq_system_mingw=true
+else
+    bcl2fastq_system_mingw=false
+fi
+
+# Determine whether this is OS X
+if echo "${bcl2fastq_system}" | grep Darwin >/dev/null 2>&1; then
+    bcl2fastq_system_darwin=true
+else
+    bcl2fastq_system_darwin=false
+fi
+
+# Choose the default install prefix.
+if ${bcl2fastq_system_mingw}; then
+    if [ "x${PROGRAMFILES}" != "x" ]; then
+        bcl2fastq_default_prefix=`bcl2fastq_fix_slashes "${PROGRAMFILES}/CMake"`
+    elif [ "x${ProgramFiles}" != "x" ]; then
+        bcl2fastq_default_prefix=`bcl2fastq_fix_slashes "${ProgramFiles}/CMake"`
+    elif [ "x${SYSTEMDRIVE}" != "x" ]; then
+        bcl2fastq_default_prefix=`bcl2fastq_fix_slashes "${SYSTEMDRIVE}/Program Files/CMake"`
+    elif [ "x${SystemDrive}" != "x" ]; then
+        bcl2fastq_default_prefix=`bcl2fastq_fix_slashes "${SystemDrive}/Program Files/CMake"`
+    else
+        bcl2fastq_default_prefix="c:/Program Files/CMake"
+    fi
+else
+    bcl2fastq_default_prefix="/usr/local"
+fi
+
+# Parse arguments
+bcl2fastq_build_type=RelWithDebInfo
+bcl2fastq_cmake_generator="Unix Makefiles"
+bcl2fastq_verbose=
+bcl2fastq_parallel=1
+for a in "$@"; do
+    if echo $a | grep "^--terse" > /dev/null 2> /dev/null; then
+        CMAKE_OPTIONS="$CMAKE_OPTIONS -DCMAKE_VERBOSE_MAKEFILE:BOOL=OFF -DBoost_DEBUG:BOOL=OFF"
+        bcl2fastq_verbose=
+    fi
+    if echo $a | grep "^--verbose" > /dev/null 2> /dev/null; then
+        CMAKE_OPTIONS="$CMAKE_OPTIONS -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -DBoost_DEBUG:BOOL=ON"
+        bcl2fastq_verbose=true
+    fi
+    if echo $a | grep "^--version" > /dev/null 2> /dev/null; then
+        echo "${bcl2fastq_version_full}, ${bcl2fastq_copyright}"
+        exit 2
+    fi
+    if echo $a | grep "^--help" > /dev/null 2> /dev/null; then
+        bcl2fastq_usage
+    fi
+    if echo $a | grep "^--build-type" > /dev/null 2> /dev/null; then
+        bcl2fastq_build_type=`echo $a | sed "s/^--build-type=//"`
+    fi
+    if echo $a | grep "^--static" > /dev/null 2> /dev/null; then
+        bcl2fastq_static=true
+    fi
+    if echo $a | grep "^--package-type=rpm" > /dev/null 2> /dev/null; then
+        bcl2fastq_package=RPM
+    fi
+    if echo $a | grep "^--package-type=deb" > /dev/null 2> /dev/null; then
+        bcl2fastq_package=DEB
+    fi
+    if echo $a | grep "^--package-type=tgz" > /dev/null 2> /dev/null; then
+        bcl2fastq_package=TGZ
+    fi
+    if echo $a | grep "^--parallel" > /dev/null 2> /dev/null; then
+        bcl2fastq_parallel=`echo $a | sed "s/^--parallel=//"`
+    fi
+    if echo $a | grep "^--with-cmake" > /dev/null 2> /dev/null; then
+        bcl2fastq_cmake=`echo $a | sed "s/^--with-cmake=//"`
+        bcl2fastq_cmake=`bcl2fastq_fix_slashes "${bcl2fastq_cmake}"` || exit $?
+    fi
+    if echo $a | grep "^--force-builddir" > /dev/null 2> /dev/null; then
+        bcl2fastq_force_builddir=true
+    fi
+    if echo $a | grep "^--with-unit-tests" > /dev/null 2> /dev/null; then
+        bcl2fastq_unit_tests=true
+    fi
+    if echo $a | grep "^--without-unit-tests" > /dev/null 2> /dev/null; then
+        bcl2fastq_unit_tests=
+    fi
+    if echo $a | grep "^--prefix=" > /dev/null 2> /dev/null; then
+        bcl2fastq_prefix_dir=`echo $a | sed "s/^--prefix=//"`
+        bcl2fastq_prefix_dir=`bcl2fastq_fix_slashes "${bcl2fastq_prefix_dir}"`
+    fi
+    if echo $a | grep "^--exec-prefix=" > /dev/null 2> /dev/null; then
+        bcl2fastq_exec_prefix_dir=`echo $a | sed "s/^--exec-prefix=//"`
+        bcl2fastq_exec_prefix_dir=`bcl2fastq_fix_slashes "${bcl2fastq_exec_prefix_dir}"`
+    fi
+    if echo $a | grep "^--bindir=" > /dev/null 2> /dev/null; then
+        bcl2fastq_bin_dir=`echo $a | sed "s/^--bindir=//"`
+        bcl2fastq_bin_dir=`bcl2fastq_fix_slashes "${bcl2fastq_bin_dir}"`
+    fi
+    if echo $a | grep "^--libdir=" > /dev/null 2> /dev/null; then
+        bcl2fastq_lib_dir=`echo $a | sed "s/^--libdir=//"`
+        bcl2fastq_lib_dir=`bcl2fastq_fix_slashes "${bcl2fastq_lib_dir}"`
+    fi
+    if echo $a | grep "^--libexecdir=" > /dev/null 2> /dev/null; then
+        bcl2fastq_libexec_dir=`echo $a | sed "s/^--libexecdir=//"`
+        bcl2fastq_libexec_dir=`bcl2fastq_fix_slashes "${bcl2fastq_libexec_dir}"`
+    fi
+    if echo $a | grep "^--includedir=" > /dev/null 2> /dev/null; then
+        bcl2fastq_include_dir=`echo $a | sed "s/^--includedir=//"`
+        bcl2fastq_include_dir=`bcl2fastq_fix_slashes "${bcl2fastq_include_dir}"`
+    fi
+    if echo $a | grep "^--datadir=" > /dev/null 2> /dev/null; then
+        bcl2fastq_data_dir=`echo $a | sed "s/^--datadir=//"`
+        bcl2fastq_data_dir=`bcl2fastq_fix_slashes "${bcl2fastq_data_dir}"`
+    fi
+    if echo $a | grep "^--docdir=" > /dev/null 2> /dev/null; then
+        bcl2fastq_doc_dir=`echo $a | sed "s/^--docdir=//"`
+        bcl2fastq_doc_dir=`bcl2fastq_fix_slashes "${bcl2fastq_doc_dir}"`
+    fi
+    if echo $a | grep "^--mandir=" > /dev/null 2> /dev/null; then
+        bcl2fastq_man_dir=`echo $a | sed "s/^--mandir=//"`
+        bcl2fastq_man_dir=`bcl2fastq_fix_slashes "${bcl2fastq_man_dir}"`
+    fi
+    if echo $a | grep "^--builddir=" > /dev/null 2> /dev/null; then
+        bcl2fastq_build_dir=`echo $a | sed "s/^--builddir=//"`
+        bcl2fastq_build_dir=`bcl2fastq_fix_slashes "${bcl2fastq_build_dir}"`
+    fi
+done
+
+if [ "${bcl2fastq_build_dir}" == "${bcl2fastq_source_dir}" ]; then
+    echo "Warning: it is recommended to build BCL2FASTQ outside of the source directory:"
+    echo "    mkdir ../bcl2fastq-build"
+    echo "    cd ../bcl2fastq-build"
+    echo "    ../$(basename $(pwd))/configure --prefix=/path/to/install/dir"
+    echo "    make"
+    echo "    make install"
+    if [ "x${bcl2fastq_force_builddir}" == "x" ]; then
+        echo "Use --force-builddir option to proceed with current build directory: ${bcl2fastq_build_dir}"
+        exit 6
+    else
+        echo "Build directory forced by --force-builddir: ${bcl2fastq_build_dir}"
+    fi
+fi
+
+# It is important to build cmake in a separate subtree from boost. Cmake 2.8.9 checks its installation folder
+# when searching for boost. If incompatible boost is present elsewhere in the system (/usr/include and such),
+# cmake caches the folder contents of its installation folder and fails to see iSAAC-built boost libraries
+# after they appear there.
+bcl2fastq_cmake_install_dir="${bcl2fastq_build_dir}/bootstrap_cmake"
+if [ "x${bcl2fastq_cmake}" == "x" ] ; then 
+    ${bcl2fastq_bootstrap_dir}/installCmake.sh ${bcl2fastq_redist_dir} ${bcl2fastq_cmake_install_dir} "${bcl2fastq_parallel}"
+    cmake_install_exit_code="$?"
+    if [ $cmake_install_exit_code == "1" ]; then
+        bcl2fastq_cmake=cmake
+        echo "Using existing `which cmake`"
+    elif [ $cmake_install_exit_code == "0" ]; then
+        bcl2fastq_cmake="${bcl2fastq_cmake_install_dir}/bin/cmake"
+        echo "Using installed ${bcl2fastq_cmake}"
+    else
+        echo "Failed to verify or install cmake"
+        exit 3
+    fi
+fi
+
+if [ "x${bcl2fastq_prefix_dir}" == "x" ] ; then bcl2fastq_prefix_dir="${bcl2fastq_default_prefix}" ; fi
+
+# display information if required
+if [ "x${bcl2fastq_verbose}" != "x" ]; then
+    echo "Source  directory: ${bcl2fastq_source_dir}"
+    echo "Prefix  directory: ${bcl2fastq_prefix_dir}"
+    echo "Exec    directory: ${bcl2fastq_exec_prefix_dir}"
+    echo "Binary  directory: ${bcl2fastq_bin_dir}"
+    echo "Lib     directory: ${bcl2fastq_lib_dir}"
+    echo "Libexec directory: ${bcl2fastq_libexec_dir}"
+    echo "Include directory: ${bcl2fastq_include_dir}"
+    echo "Data    directory: ${bcl2fastq_data_dir}"
+    echo "Doc     directory: ${bcl2fastq_doc_dir}"
+    echo "Man     directory: ${bcl2fastq_man_dir}"
+    echo "Build   directory: ${bcl2fastq_build_dir}"
+    echo "Cmake  executable: ${bcl2fastq_cmake}"
+fi  
+
+# create the build directory if necessary
+if [[ ! -d "${bcl2fastq_build_dir}" ]]; then 
+    mkdir "${bcl2fastq_build_dir}"
+    if [ "$?" != 0 ]; then
+        echo "Couldn't create the build directory: ${bcl2fastq_build_dir}"
+        exit 4
+    fi
+fi
+
+# cmake options: general
+CMAKE_OPTIONS="$CMAKE_OPTIONS -DBCL2FASTQ_NAME_SHORT:STRING=\"${bcl2fastq_name_short}\""
+CMAKE_OPTIONS="$CMAKE_OPTIONS -DBCL2FASTQ_NAME_LONG:STRING=\"${bcl2fastq_name_long}\""
+CMAKE_OPTIONS="$CMAKE_OPTIONS -DBCL2FASTQ_COPYRIGHT:STRING=\"${bcl2fastq_copyright}\""
+CMAKE_OPTIONS="$CMAKE_OPTIONS -DBCL2FASTQ_VERSION_MAJOR:STRING=\"${bcl2fastq_version_major}\""
+CMAKE_OPTIONS="$CMAKE_OPTIONS -DBCL2FASTQ_VERSION_MINOR:STRING=\"${bcl2fastq_version_minor}\""
+CMAKE_OPTIONS="$CMAKE_OPTIONS -DBCL2FASTQ_VERSION_PATCH:STRING=\"${bcl2fastq_version_patch}\""
+CMAKE_OPTIONS="$CMAKE_OPTIONS -DBCL2FASTQ_VERSION_BUILD:STRING=\"${bcl2fastq_version_build}\""
+CMAKE_OPTIONS="$CMAKE_OPTIONS -DBCL2FASTQ_VERSION:STRING=\"${bcl2fastq_version}\""
+CMAKE_OPTIONS="$CMAKE_OPTIONS -DBCL2FASTQ_SOURCE_DIR:STRING=\"${bcl2fastq_source_dir}\""
+CMAKE_OPTIONS="$CMAKE_OPTIONS -DBCL2FASTQ_PREFIX:PATH=\"${bcl2fastq_prefix_dir}\""
+CMAKE_OPTIONS="$CMAKE_OPTIONS -DBCL2FASTQ_EXEC_PREFIX:PATH=\"${bcl2fastq_exec_prefix_dir}\""
+CMAKE_OPTIONS="$CMAKE_OPTIONS -DCMAKE_INSTALL_PREFIX:PATH=\"${bcl2fastq_prefix_dir}\""
+CMAKE_OPTIONS="$CMAKE_OPTIONS -DBCL2FASTQ_BINDIR:PATH=\"${bcl2fastq_bin_dir}\""
+CMAKE_OPTIONS="$CMAKE_OPTIONS -DBCL2FASTQ_LIBDIR:PATH=\"${bcl2fastq_lib_dir}\""
+CMAKE_OPTIONS="$CMAKE_OPTIONS -DBCL2FASTQ_LIBEXECDIR:PATH=\"${bcl2fastq_libexec_dir}\""
+CMAKE_OPTIONS="$CMAKE_OPTIONS -DBCL2FASTQ_INCLUDEDIR:PATH=\"${bcl2fastq_include_dir}\""
+CMAKE_OPTIONS="$CMAKE_OPTIONS -DBCL2FASTQ_DATADIR:PATH=\"${bcl2fastq_data_dir}\""
+CMAKE_OPTIONS="$CMAKE_OPTIONS -DBCL2FASTQ_DOCDIR:PATH=\"${bcl2fastq_doc_dir}\""
+CMAKE_OPTIONS="$CMAKE_OPTIONS -DBCL2FASTQ_MANDIR:PATH=\"${bcl2fastq_man_dir}\""
+CMAKE_OPTIONS="$CMAKE_OPTIONS -DCMAKE_BUILD_TYPE:STRING=\"${bcl2fastq_build_type}\""
+CMAKE_OPTIONS="$CMAKE_OPTIONS -DCMAKE_PARALLEL:STRING=\"${bcl2fastq_parallel}\""
+
+# cmake options: force static linking
+if [ "x${bcl2fastq_static}" != "x" ]; then
+    CMAKE_OPTIONS="$CMAKE_OPTIONS -DBCL2FASTQ_FORCE_STATIC_LINK:BOOL=ON"
+    CMAKE_OPTIONS="$CMAKE_OPTIONS -DLINK_SEARCH_END_STATIC:BOOL=ON"
+fi
+
+# cmake options: cppunit
+if [ "x${bcl2fastq_unit_tests}" != "x" ]; then
+    CMAKE_OPTIONS="$CMAKE_OPTIONS -DBCL2FASTQ_UNIT_TESTS:BOOL=ON"
+fi
+
+# cmake options: packaging
+if [ "DEB" == "${bcl2fastq_package}" ]; then
+    CMAKE_OPTIONS="${CMAKE_OPTIONS} \
+        -DCPACK_GENERATOR:STRING=\"DEB\" \
+        -DCPACK_SYSTEM_NAME:STRING=\"${bcl2fastq_system}-${bcl2fastq_processor}\" \
+        -DCPACK_PACKAGE_CONTACT:STRING=\"'support@illumina.com\" \
+        -DCPACK_DEBIAN_PACKAGE_ARCHITECTURE:STRING=\"`dpkg --print-architecture`\""
+    CMAKE_OPTIONS="$CMAKE_OPTIONS -DCPACK_DEBIAN_PACKAGE_DEPENDS:STRING=\"\""
+    
+elif [ "RPM" == "${bcl2fastq_package}" ]; then
+    CMAKE_OPTIONS="${CMAKE_OPTIONS} \
+        -DCPACK_GENERATOR:STRING=\"RPM\" \
+        -DCPACK_SYSTEM_NAME:STRING=\"${bcl2fastq_system}-${bcl2fastq_processor}\" \
+        -DCPACK_PACKAGE_CONTACT:STRING=\"support@illumina.com\""
+    CMAKE_OPTIONS="$CMAKE_OPTIONS -DCPACK_RPM_PACKAGE_REQUIRES:STRING=\"\""
+elif [ "TGZ" == "${bcl2fastq_package}" ]; then
+    CMAKE_OPTIONS="${CMAKE_OPTIONS} \
+        -DCPACK_GENERATOR:STRING=\"TGZ\" \
+        -DCPACK_SYSTEM_NAME:STRING=\"${bcl2fastq_system}-${bcl2fastq_processor}\""
+fi
+
+# invoke cmake
+bcl2fastq_cmake_command="${bcl2fastq_cmake} -H'${bcl2fastq_source_dir}' -B'${bcl2fastq_build_dir}' -G'${bcl2fastq_cmake_generator}' ${CMAKE_OPTIONS}" 
+if [ "x${bcl2fastq_verbose}" != "x" ]; then
+    echo "Running on: `uname -a`"
+    echo "Configuring the build directory with:"
+    echo "    ${bcl2fastq_cmake_command}"
+fi
+
+eval "${bcl2fastq_cmake_command}"
+
+if [ "$?" != 0 ]; then
+    echo "Couldn't configure the project:"
+    echo "    ${bcl2fastq_cmake_command}"
+    if [ -f ${bcl2fastq_build_dir}/CMakeCache.txt ]; then
+        echo "Moving CMakeCache.txt to CMakeCache.txt.removed"
+        rm -f ${bcl2fastq_build_dir}/CMakeCache.txt.removed && mv ${bcl2fastq_build_dir}/CMakeCache.txt ${bcl2fastq_build_dir}/CMakeCache.txt.removed
+    fi
+    exit 5
+fi
+
+echo "The build directory ${bcl2fastq_build_dir} was configured successfully"
+echo ""
+echo Type "make" at the top level of the root directory to build BCL2FASTQ
+
+

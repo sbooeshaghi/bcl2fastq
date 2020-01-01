@@ -1,0 +1,64 @@
+################################################################################
+##
+## BCL to FASTQ file converter
+## Copyright (c) 2007-2015 Illumina, Inc.
+##
+## This software is covered by the accompanying EULA
+## and certain third party copyright/licenses, and any user of this
+## source file is bound by the terms therein.
+##
+################################################################################
+##
+## file globals.cmake
+##
+## CMake configuration file to identify the configuration of the system.
+##
+## author Roman Petrovski
+##
+################################################################################
+
+set(BCL2FASTQ_ORIG_ETCDIR      "${CMAKE_INSTALL_PREFIX}/${BCL2FASTQ_ETCDIR}")
+set(BCL2FASTQ_ORIG_DATADIR     "${CMAKE_INSTALL_PREFIX}/${BCL2FASTQ_DATADIR}")
+set(BCL2FASTQ_ORIG_BINDIR      "${CMAKE_INSTALL_PREFIX}/${BCL2FASTQ_BINDIR}")
+set(BCL2FASTQ_ORIG_LIBDIR      "${CMAKE_INSTALL_PREFIX}/${BCL2FASTQ_LIBDIR}")
+set(BCL2FASTQ_ORIG_LIBEXECDIR  "${CMAKE_INSTALL_PREFIX}/${BCL2FASTQ_LIBEXECDIR}")
+
+get_filename_component(BCL2FASTQ_FULL_ETCDIR       "${BCL2FASTQ_ORIG_ETCDIR}" ABSOLUTE)
+get_filename_component(BCL2FASTQ_FULL_DATADIR      "${BCL2FASTQ_ORIG_DATADIR}" ABSOLUTE)
+get_filename_component(BCL2FASTQ_FULL_BINDIR       "${BCL2FASTQ_ORIG_BINDIR}" ABSOLUTE)
+get_filename_component(BCL2FASTQ_FULL_LIBDIR       "${BCL2FASTQ_ORIG_LIBDIR}" ABSOLUTE)
+get_filename_component(BCL2FASTQ_FULL_LIBEXECDIR   "${BCL2FASTQ_ORIG_LIBEXECDIR}" ABSOLUTE)
+
+set(BCL2FASTQ_PARTIAL_ETCDIR "${BCL2FASTQ_ETCDIR}")
+set(BCL2FASTQ_PARTIAL_DATADIR "${BCL2FASTQ_DATADIR}")
+set(BCL2FASTQ_PARTIAL_BINDIR "${BCL2FASTQ_BINDIR}")
+set(BCL2FASTQ_PARTIAL_LIBDIR "${BCL2FASTQ_LIBDIR}")
+set(BCL2FASTQ_PARTIAL_LIBEXECDIR "${BCL2FASTQ_LIBEXECDIR}")
+
+install(CODE "
+
+    # _DEST_ variables always point to location where files are copied
+    get_filename_component(BCL2FASTQ_DEST_ETCDIR       \"\$ENV{DESTDIR}${BCL2FASTQ_ORIG_ETCDIR}\" ABSOLUTE)
+    get_filename_component(BCL2FASTQ_DEST_DATADIR      \"\$ENV{DESTDIR}${BCL2FASTQ_ORIG_DATADIR}\" ABSOLUTE)
+    get_filename_component(BCL2FASTQ_DEST_BINDIR       \"\$ENV{DESTDIR}${BCL2FASTQ_ORIG_BINDIR}\" ABSOLUTE)
+    get_filename_component(BCL2FASTQ_DEST_LIBDIR       \"\$ENV{DESTDIR}${BCL2FASTQ_ORIG_LIBDIR}\" ABSOLUTE)
+    get_filename_component(BCL2FASTQ_DEST_LIBEXECDIR   \"\$ENV{DESTDIR}${BCL2FASTQ_ORIG_LIBEXECDIR}\" ABSOLUTE)
+
+    set(BCL2FASTQ_FULL_ETCDIR \"${BCL2FASTQ_FULL_ETCDIR}\")
+    set(BCL2FASTQ_FULL_DATADIR \"${BCL2FASTQ_FULL_DATADIR}\")
+    set(BCL2FASTQ_FULL_BINDIR \"${BCL2FASTQ_FULL_BINDIR}\")
+    set(BCL2FASTQ_FULL_LIBDIR \"${BCL2FASTQ_FULL_LIBDIR}\")
+    set(BCL2FASTQ_FULL_LIBEXECDIR \"${BCL2FASTQ_FULL_LIBEXECDIR}\")
+
+    set(BCL2FASTQ_PARTIAL_ETCDIR \"${BCL2FASTQ_PARTIAL_ETCDIR}\")
+    set(BCL2FASTQ_PARTIAL_DATADIR \"${BCL2FASTQ_PARTIAL_DATADIR}\")
+    set(BCL2FASTQ_PARTIAL_BINDIR \"${BCL2FASTQ_PARTIAL_BINDIR}\")
+    set(BCL2FASTQ_PARTIAL_LIBDIR \"${BCL2FASTQ_PARTIAL_LIBDIR}\")
+    set(BCL2FASTQ_PARTIAL_LIBEXECDIR \"${BCL2FASTQ_PARTIAL_LIBEXECDIR}\")
+    
+    set(BCL2FASTQ_VERSION_FULL \"${BCL2FASTQ_VERSION_FULL}\")
+    set(BCL2FASTQ_EXECUTABLE_PERMISSIONS OWNER_WRITE OWNER_READ GROUP_READ WORLD_READ OWNER_EXECUTE GROUP_EXECUTE WORLD_EXECUTE)
+    set(BCL2FASTQ_LIBRARY_PERMISSIONS OWNER_WRITE OWNER_READ GROUP_READ WORLD_READ)
+    ")
+
+

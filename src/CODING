@@ -1,0 +1,6 @@
+Everything under this folder gets the cmake-configured. For example if a 
+configuration or a source code file has @BCL2FASTQ_FULL_LIBDIR@ string, it gets 
+converted into /<installation root>/lib/bcl2fastq_v<major>.<minor>.<development>/ in
+the installed or compiled copy of the file.
+
+

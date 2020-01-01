@@ -1,0 +1,113 @@
+
+Part I - Requirements
+=====================
+
+Network Infrastructure
+----------------------
+
+The large data volumes generated and moved when running bcl2fastq2 mean that you must have a
+high-throughput ethernet connection (at least 1 Gigabit recommended) or other data transfer
+mechanism. You can use a single multi-processor or a multi-core computer running Linux.
+
+Analysis Computer
+-----------------
+
+Illumina supports running bcl2fastq2 Conversion Software v2.17 only on Linux operating systems.
+If all of the prerequisites described in this section are met, it might be possible to run the
+software on other 64-bit Unix variants.
+
+Memory Requirements
+-------------------
+
+bcl2fastq2 requires a minimum of 32 GB RAM.
+
+Software Requirements
+---------------------
+
+bcl2fastq2 has been primarily developed and tested on CentOS 6 and RedHat Enterprise Linux 5,
+the recommended and supported platform. If all of the prerequisites described in this section
+are met, it may be possible to install and run bcl2fastq2 on other 64-bit Linux distributions
+or on other Unix variants. Particularly a similar distribution such as Fedora.
+
+The following software is required to run bcl2fastq2:
+
+ - zlib
+ - librt
+ - libpthread
+
+To build bcl2fastq2, you need the following software. Versions listed are tested and supported;
+newer versions are untested.
+
+ - gcc 4.7 (with support for c++11)
+ - boost 1.54 (with its dependencies)
+ - CMake 2.8.9
+ - zlib
+ - librt
+ - libpthread
+
+
+Part II - Installing bcl2fastq2
+===============================
+
+Installing from RPM Package
+---------------------------
+
+Root access to the system is a prerequisite for this installation procedure. The command line
+for installing the RPM file is as follows:
+
+    yum install -y <rpm-package-name>
+
+The starting point for the bcl2fastq converter is the binary executable /usr/local/bin/bcl2fastq.
+
+To install the rpm package in a user specified location, use the following command line:
+
+    rpm --install --prefix <user-specified-directory> <rpm-package-name>
+
+Installing from Source
+----------------------
+
+The installation uses the directory locations specified by the following environment variables:
+ * SOURCE: Location of the bcl2fastq2 source code
+ * BUILD: Location of the build directory
+ * INSTALL_DIR: Location where the executable is installed
+
+For example, these environment variables could be set as:
+
+    export TMP=/tmp
+    export SOURCE=${TMP}/bcl2fastq
+    export BUILD=${TMP}/bcl2fastq2-v2.17.1.x-build
+    export INSTALL_DIR=/usr/local/bcl2fastq2-v2.17.1.x
+
+NOTE: The build directory must be different from the source directory.
+
+The install procedure follows the usual steps: decompressing and extracting the source,
+configuring the build, building the package, and installing:
+
+1) Decompress and extract the source code:
+
+    cd ${TMP}
+    tar -xvzf path-to-tarball/bcl2fastq2-v2.17.10.x.tar.gz
+
+This command creates a bcl2fastq subdirectory in the ${TMP} directory.
+
+2) Configure the build:
+
+    mkdir ${BUILD}
+    cd ${BUILD}
+    ${SOURCE}/src/configure --prefix=${INSTALL_DIR}
+
+These commands create a build directory, move to that directory, and then run configure
+in that directory. The parameter --prefix provides the absolute path to the install
+directory. The command creates a subdirectory in the ${TMP} directory.
+
+3) Build the package:
+
+    make
+
+4) Install:
+
+    make install
+
+NOTE: This step can require root privilege, depending on the ${INSTALL_DIR} directory.
+
+

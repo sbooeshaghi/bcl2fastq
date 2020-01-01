@@ -1,0 +1,10 @@
+Directory structure:
+- bin: all user-facing programs
+- include: all headers
+- lib: all libraries
+
+The 'include' and 'lib' directories are subdivided into several libraries:
+- common: general-purpose components that are common to all programs
+- options: the program options
+
+

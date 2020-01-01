@@ -1,0 +1,11 @@
+The source tree is constructed to satisfy the following conditions:
+
+1. 	Easy to maintain installation scripts. In majority of cases, no changes
+	to install scripts should be needed when new files get added.
+2. 	Easy to understand the relationship between the source tree structure and
+	the resulting installation tree structure
+3. 	Fast developer access (quick branching/tagging). In particular, the ability
+	to avoid branching/tagging of rarely-changhing large binary or data files
+
+Please see the corresponding CODING file in each folder for more details
+on folder purpose and content naming conventions.
